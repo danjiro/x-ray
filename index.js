@@ -109,7 +109,7 @@ function Xray (options) {
             pages.push(obj)
           }
 
-          if (limit <= 0) {
+          if (limit < 0) {
             debug('reached limit, ending')
             stream(obj, true)
             return fn(null, pages)

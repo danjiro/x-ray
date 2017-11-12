@@ -204,9 +204,17 @@ function Request (crawler) {
   return function request (url, fn) {
     debug('fetching %s', url)
     crawler(url, function (err, ctx) {
-      if (err) return fn(err)
-      debug('got response for %s with status code: %s', url, ctx.status)
-      return fn(null, ctx.body)
+      if (err) {
+        if (err.code === 'ECONNRESET' || err.code === 'ESOCKETTIMEDOUT') {
+          debug('http error: %s - trying again...', err.code);
+          request(url, fn)
+        } else {
+          return fn(err);
+        }
+      } else {
+        debug('got response for %s with status code: %s', url, ctx.status)
+        return fn(null, ctx.body)
+      }
     })
   }
 }
